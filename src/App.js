@@ -1,25 +1,39 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import { useState } from "react";
 
-function App() {
+const App = () => {
+  const [output, setOutput] = useState("");
+  const [error, setError] = useState("");
+
+  const executePythonScript = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/execute-python", {
+        method: "POST",
+      });
+      if (response.ok) {
+        const data = await response.json();
+        if (data.output) {
+          setOutput(data.output);
+          setError("");
+        } else {
+          setError(data.error);
+        }
+      } else {
+        setError("Failed to execute Python script");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setError("Failed to execute Python script");
+    }
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <button onClick={executePythonScript}>Execute Python Script</button>
+      {output && <pre>{output}</pre>}
+      {error && <div>Error: {error}</div>}
     </div>
   );
-}
+};
 
 export default App;
